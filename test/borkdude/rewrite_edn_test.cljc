@@ -324,3 +324,17 @@
                (r/parse-string)
                (r/update :b (r/fnil r/conj []) 1)
                str)))))
+
+(deftest merge-test
+  (testing "Merge map into node"
+    (is (= "{:a [1 2 3] :b 4 :c 5}"
+           (-> "{:a [0] :b 4}"
+               (r/parse-string)
+               (r/merge {:a [1 2 3] :c 5})
+               str))))
+  (testing "Recursively merge a map into a node"
+    (is (= "{:a {:b {:c {:d 4}}}}"
+           (-> "{:a {:b {:c {:d 3}}}}"
+               (r/parse-string)
+               (r/deep-merge {:a {:b {:c {:d 4}}}})
+               str)))))

@@ -1,6 +1,6 @@
 (ns borkdude.rewrite-edn
   (:refer-clojure :exclude [assoc assoc-in update update-in dissoc get keys
-                            get-in conj fnil])
+                            get-in conj merge fnil])
   (:require [borkdude.rewrite-edn.impl :as impl]
             [rewrite-clj.node :as node]
             [rewrite-clj.parser :as p]))
@@ -69,6 +69,18 @@
 (defn conj
   [node v]
   (impl/conj node v))
+
+(defn merge
+  "Merges values of m into node (which may be a forms node as returned by
+  parse-string or map node)."
+  [node m]
+  (impl/merge node m))
+
+(defn deep-merge
+  "Recursively merges values of m into node (which may be a forms node as 
+  returned by parse-string or map node)."
+  [node m]
+  (impl/deep-merge node m))
 
 (defn fnil
   [f nil-replacement]

@@ -1,6 +1,6 @@
 (ns ^:no-doc borkdude.rewrite-edn.impl
   (:refer-clojure :exclude [get assoc update assoc-in update-in dissoc keys
-                            get-in conj fnil])
+                            get-in conj fnil merge])
   (:require
    [clojure.core :as c]
    [rewrite-clj.node :as node]
@@ -308,6 +308,22 @@
   (-> (recalc-positional-metadata forms)
       (conj* v)
       mark-for-positional-recalc))
+
+(defn merge [form m]
+  (loop [main-node form
+         m-kvs (vec m)]
+   (if (empty? m-kvs) 
+     main-node
+     (let [[k v] (first m-kvs)]
+       (recur 
+         (assoc main-node k v) 
+         (rest m-kvs))))))
+
+(defn deep-merge [form m]
+  (if (map? (node/sexpr form))
+    (merge form (for [[k v] m] 
+                  [k (deep-merge (get form k (node/coerce nil)) v)]))
+    m))
 
 (defn fnil [f nil-replacement]
   (fn [x & args]
